@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+names: ['-humans-people-armymodel', 'bnik9m nm']
+
+roboflow:
+  workspace: drone-134zh
+  project: drone-human-detection-9guwn
+  version: 8
+  license: MIT
+  url: https://universe.roboflow.com/drone-134zh/drone-human-detection-9guwn/dataset/8

@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 7
+names: ['BMP', 'Grad', 'Military truck', 'Smerch', 'Tiger', 'tank', 'undefined']
+
+roboflow:
+  workspace: testtrial
+  project: vehicles-kaoxk
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/testtrial/vehicles-kaoxk/dataset/2

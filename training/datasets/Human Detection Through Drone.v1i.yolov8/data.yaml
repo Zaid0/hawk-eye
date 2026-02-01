@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['humans']
+
+roboflow:
+  workspace: carlapit
+  project: human-detection-through-drone
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/carlapit/human-detection-through-drone/dataset/1

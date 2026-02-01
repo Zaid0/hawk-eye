@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 6
+names: ['civilian_aircraft', 'civilian_car', 'military_aircraft', 'military_helicopter', 'military_tank', 'military_truck']
+
+roboflow:
+  workspace: military-sypqz
+  project: military-ni53h
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/military-sypqz/military-ni53h/dataset/1
