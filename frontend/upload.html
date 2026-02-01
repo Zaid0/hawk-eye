@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HawkEye - Video Upload</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #667eea;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .upload-area {
+      border: 3px dashed #667eea;
+      border-radius: 15px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #f8f9ff;
+    }
+
+    .upload-area:hover {
+      border-color: #764ba2;
+      background: #f0f2ff;
+      transform: translateY(-2px);
+    }
+
+    .upload-area.dragover {
+      border-color: #764ba2;
+      background: #e8ebff;
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 64px;
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .upload-text {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .upload-hint {
+      color: #999;
+      font-size: 14px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .progress-container {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .status-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .dashboard-link {
+      display: none;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .dashboard-link a {
+      display: inline-block;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+
+    .dashboard-link a:hover {
+      transform: translateY(-2px);
+    }
+
+    .info-box {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9ff;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-box h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .info-box ul {
+      list-style: none;
+      color: #666;
+    }
+
+    .info-box li {
+      padding: 5px 0;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .info-box li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-eye"></i> HawkEye</h1>
+      <p>Drone Video Upload System</p>
+    </div>
+
+    <div id="uploadArea" class="upload-area">
+      <div class="upload-icon">
+        <i class="fas fa-cloud-upload-alt"></i>
+      </div>
+      <div class="upload-text">Click to upload or drag & drop</div>
+      <div class="upload-hint">MP4, AVI, MOV (Max 100MB)</div>
+      <input type="file" id="fileInput" accept="video/*">
+    </div>
+
+    <div id="progressContainer" class="progress-container">
+      <div class="progress-info">
+        <span id="fileName">Uploading...</span>
+        <span id="percentage">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <div id="dashboardLink" class="dashboard-link">
+      <a href="index.html">
+        <i class="fas fa-th-large"></i> Open Dashboard to View Feed
+      </a>
+    </div>
+
+    <div class="info-box">
+      <h3><i class="fas fa-info-circle"></i> How it works</h3>
+      <ul>
+        <li>Upload a video file to simulate drone camera feed</li>
+        <li>Video is processed frame-by-frame with YOLO AI detection</li>
+        <li>Live feed appears on the main dashboard automatically</li>
+        <li>All connected users see the same feed in real-time</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const fileName = document.getElementById('fileName');
+    const percentage = document.getElementById('percentage');
+    const statusMessage = document.getElementById('statusMessage');
+    const dashboardLink = document.getElementById('dashboardLink');
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleUpload(files[0]);
+      }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleUpload(e.target.files[0]);
+      }
+    });
+
+    async function handleUpload(file) {
+      // Validate file type
+      if (!file.type.startsWith('video/')) {
+        showStatus('Please upload a video file', 'error');
+        return;
+      }
+
+      // Validate file size (100MB)
+      if (file.size > 100 * 1024 * 1024) {
+        showStatus('File size exceeds 100MB limit', 'error');
+        return;
+      }
+
+      // Show progress
+      uploadArea.style.display = 'none';
+      progressContainer.style.display = 'block';
+      statusMessage.style.display = 'none';
+      dashboardLink.style.display = 'none';
+      fileName.textContent = file.name;
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('http://localhost:8000/upload-video', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'ok') {
+          progressBar.style.width = '100%';
+          percentage.textContent = '100%';
+          showStatus('✓ Upload successful! Video is being processed...', 'success');
+          dashboardLink.style.display = 'block';
+        } else {
+          throw new Error(result.message || 'Upload failed');
+        }
+      } catch (error) {
+        showStatus('✗ Upload failed: ' + error.message, 'error');
+        resetForm();
+      }
+    }
+
+    function showStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className = 'status-message ' + type;
+      statusMessage.style.display = 'block';
+    }
+
+    function resetForm() {
+      setTimeout(() => {
+        uploadArea.style.display = 'block';
+        progressContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        percentage.textContent = '0%';
+        fileInput.value = '';
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

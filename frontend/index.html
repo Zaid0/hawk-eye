@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HawkEye — Single Page Ops Dashboard (SPA)</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!--  JS  -->
+    <script defer src="app.js"></script>
+
+</head>
+<body>
+
+
+  <!-- MAIN -->
+  <main class="main">
+
+   <header style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); box-shadow:0 8px 20px rgba(2,6,23,0.5)">
+
+    <!-- Left side -->
+    <div class="left">
+      <h1 id="page-title" style="margin:0; font-size:18px">HawkEye Drone Dashboard</h1>
+      <div class="sub" id="page-sub" style="font-size:12px; color:var(--muted)">Operational Center — Live monitoring • Playback • Exports</div>
+    </div>
+
+    <!-- Right side: notifications + home button + settings + role -->
+    <div class="header-right" style="display:flex; align-items:center; gap:12px">
+
+      <!-- Notification pill -->
+      <div class="user-pill" title="Notifications" id="notif-pill"
+           style="display:flex; align-items:center; gap:4px; cursor:pointer">
+        <i class="fas fa-bell" style="color:var(--accent-2);"></i>
+        <span id="badge-count" class="badge" style="display:none">0</span>
+      </div>
+
+      <!-- Home button -->
+      <div class="user-pill" title="Home" id="home-btn"
+           style="display:flex; align-items:center; gap:4px; cursor:pointer; padding:6px 10px;">
+        <i class="fas fa-home" style="color:var(--accent-2);"></i>
+      </div>
+
+      <!-- Settings icon (will be hidden when viewing settings) -->
+      <div id="header-settings" title="Settings" style="cursor:pointer; padding:6px">
+        <i class="fas fa-cog" style="color:var(--muted); font-size:18px;"></i>
+      </div>
+     
+
+      <div id="user-role-display" class="muted" style="font-size:12px">user · role</div>
+    </div>
+
+   </header>
+
+
+    <!-- Dashboard view -->
+  
+</section>
+ <section class="mission-wrap" style="display:flex; gap:16px; flex-wrap:wrap">
+        <div class="col" style="flex:1.6">
+
+   <div class="panel">
+  <h3>HawkEye Live Drone Camera</h3>
+  <div class="video-wrap" style="width:100%; height:300px; position:relative; background:#000;">
+    <img id="live-drone-video" src="https://via.placeholder.com/640x480/1a1a2e/ffffff?text=Waiting+for+drone+feed..." style="width:100%; height:100%; object-fit:contain;">
+    <canvas id="overlay-drone" class="overlay-canvas"></canvas>
+  </div>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px">
+    <div class="muted">Live drone camera feed • real-time</div>
+    <button id="refresh-feed-btn" class="btn takeoff" style="font-size:12px; padding:4px 12px">
+      <i class="fas fa-sync-alt"></i> Refresh to Camera
+    </button>
+  </div>
+</div>
+
+          <div class="panel">
+            <h3>HawkEye Live Map</h3>
+            <div id="map-dashboard" class="map"></div>
+            <div class="muted" style="margin-top:8px">Live GPS track & flight path • simulated</div>
+          </div>
+
+
+          <div class="panel">
+            <h3>Telemetry Logs</h3>
+            <div class="search-row" style="margin-bottom:10px">
+              <label class="muted">From (s): <input type="number" id="filter-from" placeholder="0" min="0"></label>
+              <label class="muted">To (s): <input type="number" id="filter-to" placeholder="9999" min="0"></label>
+              <label class="muted">Label:
+                <select id="filter-label" style="min-width:120px"><option value="">— any —</option></select>
+              </label>
+              <button id="apply-filter" class="btn takeoff">Apply</button>
+              <button id="clear-filter" class="btn land">Clear</button>
+            </div>
+
+            <table id="telemetry-table">
+              <thead><tr><th>Time</th><th>Lat</th><th>Lng</th><th>Alt</th><th>Speed</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        
+        <div class="col" style="flex:1.3">
+          <div class="panel">
+            <h3>Recorded Footage & AI Detection</h3>
+            <div class="video-wrap" id="video-panel" style="position:relative; background:#000; height:300px;">
+              <img id="playback" src="https://via.placeholder.com/640x480/1a1a2e/ffffff?text=AI+Detection+Feed" style="width:100%; height:100%; object-fit:contain;">
+              <canvas id="overlay" class="overlay-canvas"></canvas>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px">
+              <div class="controls" id="playback-controls">
+                <button id="play-btn" class="btn takeoff">Play</button>
+                <button id="pause-btn" class="btn land">Pause</button>
+                <button id="rewind-btn" class="btn return"><< 5s</button>
+                <button id="forward-btn" class="btn hover">5s >></button>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center">
+                <label class="muted">Clip (s): <input id="clip-duration" type="number" min="1" value="6" style="width:70px"></label>
+                <button id="export-clip-btn" class="btn return rbac-export">Export Clip</button>
+                <button id="export-report-btn" class="btn takeoff rbac-export">Export Report</button>
+              </div>
+            </div>
+
+            <div class="detections-list" id="detections-list" aria-live="polite" style="margin-top:10px"></div>
+          </div>
+
+        </div>
+      </section>
+    </section>
+
+    <!-- Mission Planner view -->
+    <section id="view-mission" class="view" style="display:none">
+      <div class="panel">
+        <h3>Mission Planner</h3>
+        <div id="map-mission" class="map" style="height:420px"></div>
+        <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+          <button id="clear-waypoints" class="btn land">Clear Waypoints</button>
+          <button id="export-mission" class="btn takeoff rbac-export">Export Mission</button>
+          <div class="muted" style="margin-left:auto">Click on the map to add waypoint</div>
+        </div>
+        <table style="margin-top:10px">
+          <thead><tr><th>#</th><th>Lat</th><th>Lng</th><th>Actions</th></tr></thead>
+          <tbody id="waypoints-list"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Live Feed view -->
+    <section id="view-live" class="view" style="display:none">
+      <div class="panel">
+        <h3>Live Video Feed</h3>
+        <div class="video-wrap">
+          <video id="live-video" class="live-video" controls autoplay muted style="height:430px">
+            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+          </video>
+          <canvas id="overlay-live" class="overlay-canvas"></canvas>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Live Alerts</h3>
+        <div id="live-alerts" class="alerts"></div>
+      </div>
+    </section>
+
+    <!-- Telemetry view -->
+    <section id="view-telemetry" class="view" style="display:none">
+      <div class="panel">
+        <h3>Telemetry Logs — Full View</h3>
+        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+          <input id="telemetry-search" placeholder="Search label or time..." style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit">
+          <button id="export-csv-telemetry" class="btn takeoff rbac-export">Export CSV</button>
+        </div>
+        <table id="telemetry-full">
+          <thead><tr><th>Time</th><th>Label</th><th>Lat</th><th>Lng</th><th>Alt</th><th>Speed</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+
+
+<section id="view-settings" class="view" style="display:none">
+
+  <!-- Users & Roles Panel -->
+  <div id="users-table-section" class="settings-section">
+    <h3>Settings — Users & Roles</h3>
+    <table>
+      <thead>
+        <tr><th>Username</th><th>Role</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="users-table"></tbody>
+    </table>
+  </div>
+
+  <!-- System Settings Panel -->
+  <div id="system-settings-section" class="settings-section">
+    <h3>System Settings</h3>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button id="reset-data" class="btn land">Reset Simulated Data</button>
+      <span class="muted" style="margin-left:auto">Settings are simulated (demo)</span>
+    </div>
+  </div>
+
+</section>
+
+<div class="footer-note">HawkEye • Designer Ops — Demo SPA with simulated detection & export features</div>
+
+
+
+  <!-- Small local navigation helper (safe, won't override your app.js showView if present) -->
+  <script>
+    // Helper that either uses existing showView (SPA) or falls back to classic navigation
+    function goToView(viewId){
+      if (typeof showView === 'function') {
+        // use app's router function if exists
+        showView(viewId);
+      } else {
+        // fallback: show/hide views manually
+        document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+        const el = document.getElementById(viewId);
+        if (el) el.style.display = 'block';
+      }
+      // also update header text for common views
+      if (viewId === 'view-dashboard') {
+        const pt = document.getElementById('page-title');
+        const ps = document.getElementById('page-sub');
+        if (pt) pt.innerText = 'HawkEye Drone Dashboard';
+        if (ps) ps.innerText = 'Operational Center — Live monitoring • Playback • Exports';
+        // show settings cog
+        const cog = document.getElementById('header-settings');
+        if (cog) cog.style.display = '';
+      } else if (viewId === 'view-settings') {
+        const pt = document.getElementById('page-title');
+        const ps = document.getElementById('page-sub');
+        if (pt) pt.innerText = 'Settings';
+        if (ps) ps.innerText = 'Users, roles & system';
+        // hide settings cog while inside settings view
+        const cog = document.getElementById('header-settings');
+        if (cog) cog.style.display = 'none';
+      }
+    }
+
+    
+    // wire header buttons
+    document.getElementById('home-btn')?.addEventListener('click', ()=> goToView('view-dashboard'));
+    document.getElementById('header-settings')?.addEventListener('click', ()=> goToView('view-settings'));
+
+    // small safety: show dashboard on load (if no router)
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // if app.js handles routing, it will override; this ensures a visible view for a plain HTML preview
+      if (typeof router !== 'function') {
+        goToView('view-dashboard');
+      }
+    });
+  </script>
+
+</body>
+</html>

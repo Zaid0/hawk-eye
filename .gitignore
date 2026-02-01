@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ML/Training
+*.pt
+*.pth
+*.onnx
+*.weights
+runs/
+wandb/
+
+# Datasets (large files - keep structure, ignore actual data)
+training/datasets/*/train/images/
+training/datasets/*/valid/images/
+training/datasets/*/test/images/
+training/datasets/*/train/labels/
+training/datasets/*/valid/labels/
+training/datasets/*/test/labels/
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Node.js (frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+*.pyc
+.cache/
+
+# Claude
+.claude/
